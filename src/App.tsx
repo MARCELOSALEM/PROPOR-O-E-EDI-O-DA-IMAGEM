@@ -11,12 +11,14 @@ import ImageCropper from './components/ImageCropper';
 
 function App() {
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [originalFile, setOriginalFile] = useState<File | null>(null);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [isCropping, setIsCropping] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageSelected = (imageUrl: string) => {
+  const handleImageSelected = (imageUrl: string, file: File) => {
     setImageSrc(imageUrl);
+    setOriginalFile(file);
     setIsCropping(true);
     setCroppedImage(null);
   };
@@ -30,14 +32,19 @@ function App() {
     setIsCropping(false);
     if (!croppedImage) {
       setImageSrc(null);
+      setOriginalFile(null);
     }
   };
 
   const handleDownload = () => {
-    if (croppedImage) {
+    if (croppedImage && originalFile) {
       const link = document.createElement('a');
       link.href = croppedImage;
-      link.download = 'cropped-image.jpg';
+      // Preserve original filename but add -cropped suffix
+      const nameParts = originalFile.name.split('.');
+      const extension = nameParts.pop();
+      const newName = `${nameParts.join('.')}-cropped.${extension}`;
+      link.download = newName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -46,6 +53,7 @@ function App() {
 
   const handleReset = () => {
     setImageSrc(null);
+    setOriginalFile(null);
     setCroppedImage(null);
     setIsCropping(false);
   };
@@ -124,7 +132,14 @@ function App() {
               transition={{ duration: 0.3 }}
             >
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">Ajustar Corte</h2>
+                <div className="flex flex-col">
+                  <h2 className="text-2xl font-bold text-gray-900">Ajustar Corte</h2>
+                  {originalFile && (
+                    <span className="text-xs text-gray-500 truncate max-w-[200px]">
+                      Arquivo: {originalFile.name}
+                    </span>
+                  )}
+                </div>
                 <button 
                   onClick={handleCancelCrop}
                   className="text-sm text-gray-500 hover:text-gray-900"
@@ -134,6 +149,7 @@ function App() {
               </div>
               <ImageCropper
                 imageSrc={imageSrc}
+                mimeType={originalFile?.type || 'image/jpeg'}
                 onCropComplete={handleCropComplete}
                 onCancel={handleCancelCrop}
               />
@@ -150,7 +166,14 @@ function App() {
             >
               <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                  <h2 className="text-xl font-semibold text-gray-900">Sua Imagem Cortada</h2>
+                  <div className="flex flex-col">
+                    <h2 className="text-xl font-semibold text-gray-900">Sua Imagem Cortada</h2>
+                    {originalFile && (
+                      <span className="text-xs text-gray-500">
+                        Original: {originalFile.name}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex gap-3">
                     <button
                       onClick={() => setIsCropping(true)}

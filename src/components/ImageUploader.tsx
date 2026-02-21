@@ -2,20 +2,24 @@ import React, { useRef } from 'react';
 import { Upload } from 'lucide-react';
 
 interface ImageUploaderProps {
-  onImageSelected: (imageUrl: string) => void;
+  onImageSelected: (imageUrl: string, file: File) => void;
 }
 
 const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleFile = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      onImageSelected(reader.result as string, file);
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        onImageSelected(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      handleFile(file);
     }
   };
 
@@ -27,11 +31,7 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ onImageSelected }) => {
     event.preventDefault();
     const file = event.dataTransfer.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        onImageSelected(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      handleFile(file);
     }
   };
 

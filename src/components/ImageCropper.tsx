@@ -5,6 +5,7 @@ import getCroppedImg from '../utils/canvasUtils';
 
 interface ImageCropperProps {
   imageSrc: string;
+  mimeType: string;
   onCropComplete: (croppedImage: string) => void;
   onCancel: () => void;
 }
@@ -18,7 +19,7 @@ const ASPECT_RATIOS = [
   { label: '9:16', value: 9 / 16 },
 ];
 
-const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, onCropComplete, onCancel }) => {
+const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, mimeType, onCropComplete, onCancel }) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
@@ -45,7 +46,8 @@ const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, onCropComplete, o
         croppedAreaPixels, 
         rotation, 
         { horizontal: false, vertical: false },
-        { brightness, contrast, saturation }
+        { brightness, contrast, saturation },
+        mimeType
       );
       if (croppedImage) {
         onCropComplete(croppedImage);

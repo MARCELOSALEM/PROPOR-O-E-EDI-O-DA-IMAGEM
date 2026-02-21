@@ -33,7 +33,8 @@ export default async function getCroppedImg(
   pixelCrop: { x: number; y: number; width: number; height: number },
   rotation = 0,
   flip = { horizontal: false, vertical: false },
-  filters = { brightness: 100, contrast: 100, saturation: 100 }
+  filters = { brightness: 100, contrast: 100, saturation: 100 },
+  exportType = 'image/jpeg'
 ): Promise<string | null> {
   const image = await createImage(imageSrc)
   const canvas = document.createElement('canvas')
@@ -82,6 +83,6 @@ export default async function getCroppedImg(
   // paste generated rotate image at the top left corner
   ctx.putImageData(data, 0, 0)
 
-  // As Base64 string
-  return canvas.toDataURL('image/jpeg');
+  // As Base64 string with maximum quality
+  return canvas.toDataURL(exportType, 1.0);
 }
