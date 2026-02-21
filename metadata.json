@@ -1,0 +1,5 @@
+{
+  "name": "Redimensionador de Imagens",
+  "description": "Uma ferramenta para carregar imagens e cortá-las em proporções específicas com filtros de edição.",
+  "requestFramePermissions": []
+}
